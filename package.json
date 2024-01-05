@@ -1,0 +1,15 @@
+{
+  "name": "rock-paper-scissor",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build"
+  },
+  "author": {
+    "name": "TheWasta"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "turbo": "^1.11.3"
+  }
+}
