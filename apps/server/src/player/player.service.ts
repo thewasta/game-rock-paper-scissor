@@ -4,13 +4,8 @@ import { UpdatePlayerDto } from './dto/update-player.dto';
 
 @Injectable()
 export class PlayerService {
-  create(createPlayerDto: CreatePlayerDto) {
-    return 'This action adds a new player';
-  }
-
-  findAll() {
-    return `This action returns all player`;
-  }
+    constructor(@Inject(CACHE_MANAGER) private cache: Cache) {
+    }
 
   findOne(id: number) {
     return `This action returns a #${id} player`;
