@@ -1,0 +1,27 @@
+version: "3.9"
+name: "juego_piedra_papel_tijeras"
+services:
+  redis:
+    image: redis:6.2.5
+    command: redis-server
+    volumes:
+      - ./var/redis:/var/lib/redis
+      - ./var/redis-config:/usr/local/etc/redis/redis.conf
+    ports:
+      - ${REDIS_PORT}:6379
+    links:
+      - redis-commander
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    restart: always
+    depends_on:
+      - redis
+    environment:
+      REDIS_HOSTS: redis
+      REDIS_HOST: redis
+      REDIS_PORT: redis:6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      HTTP_USER: root
+      HTTP_PASSWORD: ${REDIS_COMMAND_PASSWORD}
+    ports:
+      - "8081:8081"
