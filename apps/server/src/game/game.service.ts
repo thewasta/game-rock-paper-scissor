@@ -1,21 +1,21 @@
 import {Inject, Injectable} from '@nestjs/common';
 import {UpdateGameDto} from './dto/update-game.dto';
 import {CACHE_MANAGER} from "@nestjs/cache-manager";
-import {Cache} from "cache-manager";
 import {GameDto} from "./dto/game.dto";
+import {CacheService} from "../redis/cache.service";
 
 @Injectable()
 export class GameService {
-    constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {
+    constructor(private readonly cacheService: CacheService) {
     }
 
     async create(createGameDto: GameDto): Promise<GameDto> {
-        return await this.cacheManager.set(`games:inProgress:${createGameDto.gameId}`, createGameDto);
+        return await this.cacheService.setCache(`games:inProgress:${createGameDto.gameId}`, createGameDto);
     }
 
     async joinGame(playerId: string, gameId: string) {
-        const game = await this.cacheManager.get<GameDto>(`games:inProgress:${gameId}`);
-        await this.cacheManager.set<GameDto>(`games:inProgress:${gameId}`, {
+        const game = await this.cacheService.getFromKey<GameDto>(`games:inProgress:${gameId}`);
+        await this.cacheService.setCache<GameDto>(`games:inProgress:${gameId}`, {
             ...game,
             playerTwo: playerId
         });
@@ -24,7 +24,7 @@ export class GameService {
     }
 
     async findOne(playerId: string, gameId: string) {
-        const searchGame = this.cacheManager.get(`games:inProgress*`);
+        const searchGame = await this.cacheService.getFromKey(`games:inProgress*`);
         console.log(searchGame);
         // Check if in progress games are available, if not create a new game
         if (!searchGame) {

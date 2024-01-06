@@ -1,11 +1,11 @@
-import {CacheModuleAsyncOptions} from "@nestjs/cache-manager";
-import {redisStore} from "cache-manager-redis-yet";
+import Redis from "ioredis";
+import {RedisOptions} from "ioredis";
 
-export const RedisOptions: CacheModuleAsyncOptions = {
-    isGlobal: true,
-    useFactory: async () => ({
-        store: await redisStore(
-
-        )
-    })
+export const redisConfig: RedisOptions = {
+    host: "localhost",
+    port: 6379,
+    username: "default",
+    password: "secret"
 }
+
+export const RedisClient = new Redis(redisConfig);

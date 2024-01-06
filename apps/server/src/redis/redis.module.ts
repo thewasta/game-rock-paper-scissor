@@ -1,11 +1,19 @@
-import {Module} from '@nestjs/common';
-import {CacheModule} from "@nestjs/cache-manager";
-import {RedisOptions} from "./config/app.options.constant";
+import {Global, Module} from '@nestjs/common';
+import {RedisClient} from "./config/app.options.constant";
+import {CacheService} from "./cache.service";
 
+@Global()
 @Module({
-    imports: [
-        CacheModule.registerAsync(RedisOptions)
+    providers: [
+        {
+            provide: 'REDIS_CLIENT',
+            useValue: RedisClient
+        },
+        CacheService
     ],
+    exports: [
+        CacheService
+    ]
 })
 export class RedisModule {
 }
