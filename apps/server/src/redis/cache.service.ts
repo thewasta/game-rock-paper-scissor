@@ -1,5 +1,5 @@
-import {Inject, Injectable} from "@nestjs/common";
-import {Redis} from "ioredis";
+import {Inject, Injectable} from '@nestjs/common';
+import {Redis} from 'ioredis';
 
 @Injectable()
 export class CacheService {
@@ -14,8 +14,17 @@ export class CacheService {
         return null;
     }
 
+    async getFromBranch<T>(branch: string):Promise<T[]> {
+        const keys = await this.redisClient.keys(`${branch}*`);
+        if (keys.length > 0) {
+            const results = await this.redisClient.mget(keys);
+            return results.map(result => JSON.parse(result));
+        }
+        return [];
+    }
+
     async setCache<T>(key: string, value: any): Promise<T> {
         await this.redisClient.set(key, JSON.stringify(value));
-        return this.getFromKey(key)
+        return this.getFromKey(key);
     }
 }

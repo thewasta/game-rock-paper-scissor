@@ -1,8 +1,7 @@
-import {Inject, Injectable} from '@nestjs/common';
+import {Injectable} from '@nestjs/common';
 import {UpdateGameDto} from './dto/update-game.dto';
-import {CACHE_MANAGER} from "@nestjs/cache-manager";
-import {GameDto} from "./dto/game.dto";
-import {CacheService} from "../redis/cache.service";
+import {GameDto} from './dto/game.dto';
+import {CacheService} from '../redis/cache.service';
 
 @Injectable()
 export class GameService {
@@ -10,25 +9,29 @@ export class GameService {
     }
 
     async create(createGameDto: GameDto): Promise<GameDto> {
-        return await this.cacheService.setCache(`games:inProgress:${createGameDto.gameId}`, createGameDto);
+        return await this.cacheService.setCache(
+            `games:inProgress:${createGameDto.gameId}`,
+            createGameDto,
+        );
     }
 
     async joinGame(playerId: string, gameId: string) {
-        const game = await this.cacheService.getFromKey<GameDto>(`games:inProgress:${gameId}`);
+        const game = await this.cacheService.getFromKey<GameDto>(
+            `games:inProgress:${gameId}`,
+        );
         await this.cacheService.setCache<GameDto>(`games:inProgress:${gameId}`, {
             ...game,
-            playerTwo: playerId
+            playerTwo: playerId,
         });
 
         return gameId;
     }
 
-    async findOne(playerId: string, gameId: string) {
-        const searchGame = await this.cacheService.getFromKey(`games:inProgress*`);
-        console.log(searchGame);
+    async findOne(playerId: string, gameId: string): Promise<GameDto> {
+        const searchGame: GameDto[] = await this.cacheService.getFromBranch("games:inProgress:");
         // Check if in progress games are available, if not create a new game
-        if (!searchGame) {
-            await this.create({
+        if (searchGame.length === 0) {
+            const newGame = {
                 playerOne: playerId,
                 gameId: gameId,
                 playing: false,
@@ -36,16 +39,16 @@ export class GameService {
                 playerTwo: null,
                 rounds: [],
                 won: null,
-                startedBy: playerId
-            });
-            console.log("Room created");
+                startedBy: playerId,
+            }
+            await this.create(newGame);
             // room id will be the game id from the first user
-            return gameId;
+            return newGame;
         } else {
-            console.log("Joined to existed game");
-            // const randomElement = searchGame[Math.floor(Math.random() * searchGame.length)];
-            //
-            // return await this.joinGame(playerId, randomElement.gameId);
+
+            const randomElement = searchGame[Math.floor(Math.random() * searchGame.length)];
+            await this.joinGame(playerId, randomElement.gameId);
+            return randomElement;
         }
     }
 

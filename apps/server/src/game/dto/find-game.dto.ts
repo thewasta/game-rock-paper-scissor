@@ -1,4 +1,4 @@
 export class FindGameDto {
-    playerId: string;
-    gameId: string;
+  playerId: string;
+  gameId: string;
 }
