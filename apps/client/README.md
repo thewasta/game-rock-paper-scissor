@@ -3,11 +3,11 @@
 Execute
 
 ````shell
-npm install -D tailwindcss
+npm install -D tailwindcss postcss autoprefixer
 ````
 
 ````shell
-npx tailwindcss init
+npx tailwindcss init -p
 ````
 
 Paste in ``tailwind.config.js``
@@ -15,7 +15,8 @@ Paste in ``tailwind.config.js``
 ```javascript
 module.exports = {
     content: [
-        "./src/**/*.{html,js}"
+        "./index.html",
+        "./src/**/*.{js,ts,jsx,tsx}",
     ],
     theme: {
         extend: {}
@@ -30,9 +31,4 @@ Add base CSS to `index.css`
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-````
-
-Build css
-````shell
-npx tailwindcss -i ./src/index.css -o ./src/output.css --watch
 ````
