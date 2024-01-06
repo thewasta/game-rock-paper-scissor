@@ -1,21 +1,20 @@
-import { Injectable } from '@nestjs/common';
-import { CreatePlayerDto } from './dto/create-player.dto';
-import { UpdatePlayerDto } from './dto/update-player.dto';
+import {Inject, Injectable} from '@nestjs/common';
+import {CACHE_MANAGER} from "@nestjs/cache-manager";
+import {Cache} from "cache-manager"
+import {Player} from "./entities/player.entity";
 
 @Injectable()
 export class PlayerService {
     constructor(@Inject(CACHE_MANAGER) private cache: Cache) {
     }
 
-  findOne(id: number) {
-    return `This action returns a #${id} player`;
-  }
-
-  update(id: number, updatePlayerDto: UpdatePlayerDto) {
-    return `This action updates a #${id} player`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} player`;
-  }
+    async findOne(id: number): Promise<Player> {
+        const redisKey = `players:${id}`;
+        let player: Player = await this.cache.get(redisKey);
+        if (!player) {
+            player = {total: 0, wins: 0, createdAt: new Date()}
+            await this.cache.set<Player>(redisKey, player);
+        }
+        return player;
+    }
 }
