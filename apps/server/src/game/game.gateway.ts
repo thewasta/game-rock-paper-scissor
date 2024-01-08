@@ -4,38 +4,33 @@ import {
     MessageBody,
     WebSocketServer,
     ConnectedSocket,
-    WsResponse,
-    OnGatewayInit,
+    OnGatewayConnection, OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import {GameService} from './game.service';
 import {FindGameDto} from './dto/find-game.dto';
 import {FinishGameDto} from './dto/finish-game.dto';
 import {Server, Socket} from 'socket.io';
-import {OnModuleInit, UseGuards} from '@nestjs/common';
-import {from, map, Observable} from 'rxjs';
-import {json, raw} from 'express';
+import {UseGuards} from '@nestjs/common';
 import {GameGuard} from "./game.guard";
 
 @WebSocketGateway()
-export class GameGateway implements OnModuleInit {
+export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer()
     private server: Server;
 
     constructor(private readonly gameService: GameService) {
     }
 
-    onModuleInit(): any {
-        const self = this;
-        this.server.on('connection', (client: Socket) => {
-            console.log(`Client ${client.id} connected`);
-            console.log(`Total: ${self.server.engine.clientsCount}`)
-            self.server.sockets.emit('user count', self.server.engine.clientsCount);
-            client.on('disconnect', () => {
-                self.server.sockets.emit('user count', self.server.engine.clientsCount);
-                console.log(`Total: ${self.server.engine.clientsCount}`)
-                console.log('CLIENT DISCONNECTED');
-            });
-        });
+    handleConnection(client: any, ...args): any {
+        console.log(`New client connected ${client.id}`)
+        client.broadcast.emit("user count", this.server.engine.clientsCount)
+    }
+
+    handleDisconnect(client: any): any {
+        console.log(`Client disconnected ${client.id}`);
+        setTimeout(() => {
+            this.server.emit("user count disconnect", this.server.engine.clientsCount);
+        }, 100);
     }
 
     @UseGuards(GameGuard)
