@@ -22,8 +22,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     handleConnection(client: any, ...args): any {
-        console.log(`New client connected ${client.id}`)
-        client.broadcast.emit("user count", this.server.engine.clientsCount)
+        console.log(`New client connected ${client.id}`);
+        client.broadcast.emit("user count", this.server.engine.clientsCount);
+        client.emit("welcome")
     }
 
     handleDisconnect(client: any): any {
