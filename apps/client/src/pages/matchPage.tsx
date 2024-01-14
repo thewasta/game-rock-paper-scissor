@@ -1,24 +1,35 @@
-import {JSX} from "react";
-import {InGameSidePage} from "../components/inGameSide.page.tsx";
+import {JSX, useEffect, useState} from "react";
+import {InGameSidePage} from "../components/inGameSidePage.tsx";
+import {useCookies} from "react-cookie";
+import {InGameSeparatorComponent} from "../components/inGameSeparatorComponent.tsx";
+import {CurrentGameInterface, useSocket} from "../provider/socketProvider.tsx";
 
+interface Props {
+    currentGame: CurrentGameInterface
+}
 
-export function MatchPage(): JSX.Element {
-    const isMe = true;
-    const handleClick = () => {
+export function MatchPage({currentGame}: Props): JSX.Element {
+    const [cookie] = useCookies(["rockpaperscissor"]);
+    const {socket, setGameId} = useSocket();
+    const [playerAcceptedMatch, setPlayerAcceptedMatch] = useState<boolean>(false)
+    useEffect(() => {
+        socket?.on('start game', () => {
+            setPlayerAcceptedMatch(true);
+        });
 
-    }
-
+        socket?.on('leave-room', () => {
+            setGameId(null);
+        })
+        return () => {
+            socket?.off('start game');
+            socket?.off('leave-room');
+        }
+    }, []);
     return (
         <div className="p-10 flex justify-evenly h-screen items-center">
-            {isMe ? <InGameSidePage playerNick="P1 Name"/> : <InGameSidePage playerNick="P2 name"/>}
-            <div className="grow flex-col flex items-center justify-evenly h-48">
-                <h3 className="font-bold text-2xl">Resultado</h3>
-                <span className="text-xs bg-gray-300 rounded-full text-gray-800 font-medium px-2 py-0.5 me-2">Esperando jugador...</span>
-                <button className="underline" onClick={handleClick}>
-                    Abandonar
-                </button>
-            </div>
-            {isMe ? <InGameSidePage playerNick="P2 Name"/> : <InGameSidePage playerNick="P1 name"/>}
+            <InGameSidePage playerNick={cookie["rockpaperscissor"]} isMe={true}/>
+            <InGameSeparatorComponent gameAccepted={playerAcceptedMatch}/>
+            <InGameSidePage playerNick="P2 Name" isMe={false}/>
         </div>
     );
 }

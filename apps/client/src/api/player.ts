@@ -1,1 +1,1 @@
-export const getPlayerStats = () => fetch(`/`);
+export const getPlayerStats = async (playerId: string) => fetch(`api/player/${playerId ?? "1"}`)

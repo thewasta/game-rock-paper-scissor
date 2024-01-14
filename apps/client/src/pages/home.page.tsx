@@ -1,13 +1,66 @@
-import {JSX} from "react";
-import {Link} from "react-router-dom";
+import {JSX, useCallback, useEffect, useState} from "react";
+import {useNavigate} from "react-router-dom";
+import {CurrentGameInterface, PlayerStats, useSocket} from "../provider/socketProvider.tsx";
+import {useCookies} from "react-cookie";
 
 export function HomePage(): JSX.Element {
+    const navigate = useNavigate();
+    const {socket, setGameId} = useSocket()
+    const [cookie] = useCookies(["rockpaperscissor"])
+    const [totalPlayers, setTotalPlayers] = useState<number>(0)
+    const [playerData, setPlayerData] = useState<PlayerStats>({
+        total: 0,
+        wins: 0
+    })
+    useEffect(() => {
+        fetch(`api/player/${cookie["rockpaperscissor"]}`)
+            .then(response => response.json())
+            .then(json => {
+                setPlayerData({
+                    total: json.total,
+                    wins: json.wins
+                });
+            })
+    }, []);
+
+    useEffect(() => {
+        socket?.on('joined', (gameId: CurrentGameInterface) => {
+            setGameId(gameId);
+            navigate('/match', {
+                replace: true
+            });
+        });
+
+        socket?.on('user count', (count: number) => {
+            setTotalPlayers(count)
+        });
+
+        socket?.on('user count disconnect', (count: number) => {
+            setTotalPlayers(count);
+        });
+
+        return () => {
+            socket?.off('joined');
+            socket?.off('user count');
+            socket?.off('user count disconnect');
+        }
+    }, [socket]);
+    const handleClick = useCallback(() => {
+        console.log("CLICKEADO BUSCARD");
+        const gameId = crypto.randomUUID();
+        socket?.emit('find game', {
+            playerId: cookie["rockpaperscissor"],
+            gameId
+        });
+    }, [socket]);
+
     return (
         <div className="flex flex-col h-screen items-center justify-center bg-gray-100 p-4">
             <header className="flex flex-col items-center w-full md:w-1/2 lg:w-1/3">
                 <h1 className="text-4xl font-bold mb-4">Piedra Papel y Tijeras</h1>
                 <h2>Tu id: {"playerId"}</h2>
-                <h3>Jugadores en línea {"totalPlayers" || 0}</h3>
+                <h3>Jugadores en línea {totalPlayers}</h3>
+                <h4>Total wins: {playerData.total}</h4>
             </header>
             <main className="flex flex-col items-center w-full md:w-1/2 lg:w-1/3 mt-10">
                 <div className="flex flex-col justify-center gap-4 mb-8 shadow-md border-2 p-5 w-full">
@@ -24,23 +77,22 @@ export function HomePage(): JSX.Element {
                         </thead>
                         <tbody>
                         <tr>
-                            <td>5</td>
-                            <td>3</td>
-                            <td>2</td>
-                            <td>{(5 * 100) / 10}</td>
-                            <td>{5 * 3}</td>
+                            <td>{playerData.total}</td>
+                            <td>{playerData.wins}</td>
+                            <td>{playerData.total - playerData.wins}</td>
+                            <td>{(((playerData.total - playerData.wins) * 100) / playerData.total) || 0}</td>
+                            <td>{playerData.wins * 3}</td>
                         </tr>
                         </tbody>
                     </table>
                 </div>
                 <div className="mb-5">
-                    <Link
-                        replace={true}
-                        to={'/match'}
+                    <button
                         className="text-white bg-gray-700 hover:bg-gray-800 rounded-lg px-5 py-2.5 cursor-pointer"
+                        onClick={handleClick}
                     >
                         Nueva partida
-                    </Link>
+                    </button>
                 </div>
                 {(<div role="status">
                     <svg aria-hidden="true"
