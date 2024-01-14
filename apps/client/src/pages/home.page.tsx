@@ -1,10 +1,8 @@
 import {JSX, useCallback, useEffect, useState} from "react";
-import {useNavigate} from "react-router-dom";
 import {CurrentGameInterface, PlayerStats, useSocket} from "../provider/socketProvider.tsx";
 import {useCookies} from "react-cookie";
 
 export function HomePage(): JSX.Element {
-    const navigate = useNavigate();
     const {socket, setGameId} = useSocket()
     const [cookie] = useCookies(["rockpaperscissor"])
     const [totalPlayers, setTotalPlayers] = useState<number>(0)
@@ -25,10 +23,8 @@ export function HomePage(): JSX.Element {
 
     useEffect(() => {
         socket?.on('joined', (gameId: CurrentGameInterface) => {
+            console.log("SE HA RECIBIDO JOINED");
             setGameId(gameId);
-            navigate('/match', {
-                replace: true
-            });
         });
 
         socket?.on('user count', (count: number) => {

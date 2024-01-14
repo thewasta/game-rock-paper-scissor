@@ -9,6 +9,7 @@ interface Props {
 }
 
 export function MatchPage({currentGame}: Props): JSX.Element {
+    console.log("MATCH PAGE");
     const [cookie] = useCookies(["rockpaperscissor"]);
     const {socket, setGameId} = useSocket();
     const [playerAcceptedMatch, setPlayerAcceptedMatch] = useState<boolean>(false)
