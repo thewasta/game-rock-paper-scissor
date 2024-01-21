@@ -30,10 +30,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     async handleConnection(client: Socket): Promise<void> {
         this.logger.debug(`New client connected ${client.id}`);
-        const cookies = client.handshake.headers.cookie;
-        const splitCookies = cookies.split("; ")
-        const userSessionCookie = splitCookies.find(cookie => cookie.startsWith('rockpaperscissor')).split('=')[1];
-        await this.gameService.playerConnection(userSessionCookie, client.id);
+        try {
+            const cookies = client.handshake.headers.cookie;
+            const splitCookies = cookies.split("; ")
+            const userSessionCookie = splitCookies.find(cookie => cookie.startsWith('rockpaperscissor')).split('=')[1];
+            await this.gameService.playerConnection(userSessionCookie, client.id);
+        }catch (e) {
+           this.logger.error('Unable to get COOKIE');
+        }
         setTimeout(() => {
             client.broadcast.emit("user count", this.server.engine.clientsCount);
         }, 100);
@@ -41,10 +45,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     async handleDisconnect(client: Socket): Promise<void> {
         this.logger.debug(`Client disconnect: ${client.id}`);
-        const cookies = client.handshake.headers.cookie;
-        const splitCookies = cookies.split("; ")
-        const userSessionCookie = splitCookies.find(cookie => cookie.startsWith('rockpaperscissor')).split('=')[1];
-        await this.gameService.playerDisconnection(userSessionCookie, client.id)
+        try {
+            const cookies = client.handshake.headers.cookie;
+            const splitCookies = cookies.split("; ")
+            const userSessionCookie = splitCookies.find(cookie => cookie.startsWith('rockpaperscissor')).split('=')[1];
+            await this.gameService.playerDisconnection(userSessionCookie, client.id)
+        }catch (e) {
+            this.logger.error('Unable to get COOKIE');
+        }
         setTimeout(() => {
             this.server.emit("user count disconnect", this.server.engine.clientsCount);
         }, 100);
