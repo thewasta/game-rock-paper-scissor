@@ -24,7 +24,7 @@ export function HomePage(): JSX.Element {
         }
     }, []);
     useEffect(() => {
-        console.log(unauthorized)
+        console.info(unauthorized)
         if (unauthorized) {
             alert('Ya estás en una partida.');
         }
