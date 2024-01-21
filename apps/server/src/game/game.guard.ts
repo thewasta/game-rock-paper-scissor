@@ -13,12 +13,12 @@ export class GameGuard implements CanActivate {
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const client = context.switchToWs().getClient<Socket>();
         const cookies = client.handshake.headers.cookie;
-        if (!cookies) {
+        if (undefined === cookies) {
             client.emit("unauthorized", "Cookie not provided");
             return false;
         }
         const splitCookies = cookies.split("; ")
-        const userSessionCookie = splitCookies.find(cookie => cookie.startsWith('rps-game')).split('=')[1];
+        const userSessionCookie = splitCookies.find(cookie => cookie.startsWith('rockpaperscissor')).split('=')[1];
         if (!userSessionCookie) {
             client.emit("unauthorized", "Cookie not provided");
             return false;
@@ -34,7 +34,7 @@ export class GameGuard implements CanActivate {
         }
         if (client.rooms.size > 1) {
             client.emit("unauthorized", "You are already in a room");
-            return false;
+            return true;
         }
         return true;
     }

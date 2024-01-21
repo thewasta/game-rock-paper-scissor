@@ -1,10 +1,10 @@
 export type GameActions = 'ROCK' | 'PAPER' | 'SCISSOR';
 
-interface GameRound {
+export interface GameRound {
   round: number;
-  playerOne: GameActions;
-  playerTwo: GameActions;
-  winner: string;
+  playerOne?: GameActions;
+  playerTwo?: GameActions;
+  winner?: string;
 }
 
 export class GameDto {

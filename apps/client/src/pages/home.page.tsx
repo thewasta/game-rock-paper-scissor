@@ -3,27 +3,38 @@ import {CurrentGameInterface, PlayerStats, useSocket} from "../provider/socketPr
 import {useCookies} from "react-cookie";
 
 export function HomePage(): JSX.Element {
-    const {socket, setGameId} = useSocket()
+    const {socket,unauthorized, setGameId} = useSocket()
     const [cookie] = useCookies(["rockpaperscissor"])
     const [totalPlayers, setTotalPlayers] = useState<number>(0)
+    const [socketConnected, setSocketConnected] = useState<boolean>(false)
     const [playerData, setPlayerData] = useState<PlayerStats>({
         total: 0,
         wins: 0
     })
     useEffect(() => {
-        fetch(`api/player/${cookie["rockpaperscissor"]}`)
-            .then(response => response.json())
-            .then(json => {
-                setPlayerData({
-                    total: json.total,
-                    wins: json.wins
-                });
-            })
+        if (cookie["rockpaperscissor"]) {
+            fetch(`api/player/${cookie["rockpaperscissor"]}`)
+                .then(response => response.json())
+                .then(json => {
+                    setPlayerData({
+                        total: json.total,
+                        wins: json.wins
+                    });
+                })
+        }
     }, []);
-
     useEffect(() => {
+        console.log(unauthorized)
+        if (unauthorized) {
+            alert('Ya estás en una partida.');
+        }
+    }, [unauthorized]);
+    useEffect(() => {
+        setSocketConnected(socket?.connected || false);
+        socket?.on('connection found', () => {
+            console.log('YOU ALREADY HAVE A CONNECTION');
+        });
         socket?.on('joined', (gameId: CurrentGameInterface) => {
-            console.log("SE HA RECIBIDO JOINED");
             setGameId(gameId);
         });
 
@@ -42,7 +53,6 @@ export function HomePage(): JSX.Element {
         }
     }, [socket]);
     const handleClick = useCallback(() => {
-        console.log("CLICKEADO BUSCARD");
         const gameId = crypto.randomUUID();
         socket?.emit('find game', {
             playerId: cookie["rockpaperscissor"],
@@ -54,9 +64,12 @@ export function HomePage(): JSX.Element {
         <div className="flex flex-col h-screen items-center justify-center bg-gray-100 p-4">
             <header className="flex flex-col items-center w-full md:w-1/2 lg:w-1/3">
                 <h1 className="text-4xl font-bold mb-4">Piedra Papel y Tijeras</h1>
+                <h1 className="text-2xl font-bold">
+                    Tu estado actual es: {socketConnected ? 'Conectado' : 'Desconectado'}
+                </h1>
                 <h2>Tu id: {"playerId"}</h2>
                 <h3>Jugadores en línea {totalPlayers}</h3>
-                <h4>Total wins: {playerData.total}</h4>
+                <h4>Total wins: {playerData.wins}</h4>
             </header>
             <main className="flex flex-col items-center w-full md:w-1/2 lg:w-1/3 mt-10">
                 <div className="flex flex-col justify-center gap-4 mb-8 shadow-md border-2 p-5 w-full">

@@ -9,12 +9,19 @@ export class CacheService {
     async getFromKey<T>(key: string): Promise<T | null> {
         const redisResponse = await this.redisClient.get(key);
         if (redisResponse) {
+            if (`/${key}/`.match("players:socket")) {
+                console.log(redisResponse)
+            }
             return JSON.parse(redisResponse) as T;
         }
         return null;
     }
 
-    async getFromBranch<T>(branch: string):Promise<T[]> {
+    async delete<T>(key: string): Promise<void> {
+        await this.redisClient.del(key);
+    }
+
+    async getFromBranch<T>(branch: string): Promise<T[]> {
         const keys = await this.redisClient.keys(`${branch}*`);
         if (keys.length > 0) {
             const results = await this.redisClient.mget(keys);

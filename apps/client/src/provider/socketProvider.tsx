@@ -15,12 +15,14 @@ export interface CurrentGameInterface {
 
 export interface SocketContextInterface {
     socket?: Socket,
+    unauthorized: boolean;
     currentGame: CurrentGameInterface | null,
     setGameId: (gameId: CurrentGameInterface | null) => void
 }
 
 export const SocketContext = createContext<SocketContextInterface>({
     currentGame: null,
+    unauthorized: false,
     setGameId: () => {
 
     }
@@ -34,6 +36,7 @@ export const useSocket = () => useContext(SocketContext);
 export const SocketProvider: React.FC<Props> = ({children}) => {
     const today = new Date();
 
+    const [serverErrorMessage, setServerErrorMessage] = useState<boolean>(false);
     const [cookie, setCookie] = useCookies(["rockpaperscissor"])
     const [socket, setSocket] = useState<Socket>()
     const [currentGameId, setCurrentGameId] = useState<CurrentGameInterface | null>(null);
@@ -57,12 +60,21 @@ export const SocketProvider: React.FC<Props> = ({children}) => {
         };
     }, []);
 
+    useEffect(() => {
+        socket?.on('unauthorized', () => {
+            setServerErrorMessage(true);
+            setTimeout(() => {
+                setServerErrorMessage(false);
+            },200);
+        })
+    }, [socket]);
     const setGameId = useCallback((currentGame: CurrentGameInterface | null) => {
         setCurrentGameId(currentGame);
     }, [])
 
     const value: SocketContextInterface = {
         socket,
+        unauthorized: serverErrorMessage,
         currentGame: currentGameId,
         setGameId
     };

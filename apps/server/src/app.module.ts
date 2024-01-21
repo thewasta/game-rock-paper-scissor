@@ -5,9 +5,16 @@ import {PlayerModule} from './player/player.module';
 import {RedisModule} from './redis/redis.module';
 import {GameModule} from './game/game.module';
 import {RequestTraceMiddleware} from "./middleware/requestTraceMiddleware";
+import {ConfigModule} from '@nestjs/config';
+import {ServeStaticModule} from "@nestjs/serve-static";
+import {join} from "path";
 
 @Module({
-    imports: [RedisModule, PlayerModule, GameModule],
+    imports: [
+        ServeStaticModule.forRoot({
+            renderPath: join(__dirname, '..', '..', 'client', 'dist')
+        }),
+        ConfigModule.forRoot(), RedisModule, PlayerModule, GameModule],
     controllers: [AppController],
     providers: [AppService],
 })

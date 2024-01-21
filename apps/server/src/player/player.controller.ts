@@ -9,6 +9,6 @@ export class PlayerController {
 
   @Get(':id')
   findOne(@Param('id') id: string): Promise<Player> {
-    return this.playerService.findOne(+id);
+    return this.playerService.findOne(id);
   }
 }

@@ -9,11 +9,10 @@ services:
       - ./var/redis-config:/usr/local/etc/redis/redis.conf
     ports:
       - ${REDIS_PORT}:6379
-    links:
-      - redis-commander
   redis-commander:
     image: rediscommander/redis-commander:latest
-    restart: always
+    depends_on:
+      - redis
     environment:
       REDIS_HOSTS: redis
       REDIS_HOST: redis
