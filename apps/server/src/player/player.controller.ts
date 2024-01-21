@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import {Controller, Get, HttpCode, Param} from '@nestjs/common';
 import { PlayerService } from './player.service';
 import { Player } from './entities/player.entity';
 
@@ -8,6 +8,7 @@ export class PlayerController {
     }
 
   @Get(':id')
+  @HttpCode(200)
   findOne(@Param('id') id: string): Promise<Player> {
     return this.playerService.findOne(id);
   }
