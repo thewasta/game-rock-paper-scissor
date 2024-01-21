@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "turbo dev",
-    "build": "turbo build"
+    "build": "turbo build",
+    "start": "node apps/server/dist/main.js"
   },
   "author": {
     "name": "TheWasta"
