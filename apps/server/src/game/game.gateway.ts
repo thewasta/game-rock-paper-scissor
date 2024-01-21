@@ -25,7 +25,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private logger = new Logger();
 
     constructor(private readonly gameService: GameService, private readonly roomService: RoomService) {
-        this.logger.debug(JSON.stringify(this.server.engine));
+        this.logger.debug(JSON.stringify(this.server));
     }
 
     async handleConnection(client: Socket): Promise<void> {
