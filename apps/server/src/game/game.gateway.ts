@@ -15,11 +15,9 @@ import {GameGuard} from "./game.guard";
 import {QuitGameDto} from "./dto/quit-game.dto";
 import {RoomService} from "./room.service";
 import {RoundGameDto} from "./dto/round-game.dto";
-import {raw} from "express";
 import {GameDto} from "./dto/game.dto";
-import {PlayerAlreadyConnected} from "./exception/player-already.connected";
 
-@WebSocketGateway()
+@WebSocketGateway(4000)
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer()
     private server: Server;
