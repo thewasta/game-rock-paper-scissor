@@ -119,6 +119,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 const playerSocket = await this.gameService.findPlayerSocket(game.won);
                 await this.gameService.finish(game.gameId, game.won);
                 this.server.to(playerSocket).emit('you won');
+
+                const playerLooserCookie = game.won === game.playerOne ? game.playerTwo : game.playerOne;
+                const playerLooser = await this.gameService.findPlayerSocket(playerLooserCookie)
+                this.server.to(playerLooser).emit('finished game');
             }
 
             if (action instanceof GameDto) {
