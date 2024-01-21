@@ -12,7 +12,8 @@ import {join} from "path";
 @Module({
     imports: [
         ServeStaticModule.forRoot({
-            renderPath: join(__dirname, '..', '..', 'client', 'dist')
+            rootPath: join(__dirname, '..', '..', 'client', 'dist'),
+            exclude: ['/api/(.*)'],
         }),
         ConfigModule.forRoot(), RedisModule, PlayerModule, GameModule],
     controllers: [AppController],
