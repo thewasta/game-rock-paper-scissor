@@ -42,6 +42,7 @@ export const SocketProvider: React.FC<Props> = ({children}) => {
     const [currentGameId, setCurrentGameId] = useState<CurrentGameInterface | null>(null);
 
     useEffect(() => {
+        console.log({url: import.meta.env.VITE_SOCKET_URL});
         const expiresIn = today.setDate(today.getDate() + 30);
         const playerId = crypto.randomUUID()
         if (!cookie["rockpaperscissor"]) {
@@ -54,7 +55,7 @@ export const SocketProvider: React.FC<Props> = ({children}) => {
         });
 
         setSocket(socketConnection);
-        console.debug({
+        console.log({
             url: import.meta.env.VITE_SOCKET_URL,
             cookie: cookie["rockpaperscissor"],
             socket: socket
