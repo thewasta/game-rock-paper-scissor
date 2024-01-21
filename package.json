@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "turbo dev",
-    "build": "turbo build && pnpm start",
+    "build": "turbo build",
     "start": "node apps/server/dist/main.js"
   },
   "author": {
