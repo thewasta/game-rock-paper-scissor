@@ -54,7 +54,11 @@ export const SocketProvider: React.FC<Props> = ({children}) => {
         });
 
         setSocket(socketConnection);
-
+        console.debug({
+            url: import.meta.env.VITE_SOCKET_URL,
+            cookie: cookie["rockpaperscissor"],
+            socket: socket
+        });
         return () => {
             socket?.disconnect();
         };
