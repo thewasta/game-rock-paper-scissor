@@ -17,7 +17,7 @@ import {RoomService} from "./room.service";
 import {RoundGameDto} from "./dto/round-game.dto";
 import {GameDto} from "./dto/game.dto";
 
-@WebSocketGateway(4000)
+@WebSocketGateway()
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer()
     private server: Server;
