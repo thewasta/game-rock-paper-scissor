@@ -11,6 +11,6 @@
   },
   "license": "ISC",
   "dependencies": {
-    "turbo": "^1.11.3"
+    "turbo": "^1.13.4"
   }
 }
